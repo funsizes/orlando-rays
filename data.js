@@ -46,8 +46,32 @@ const OTHER_RESULTS = [];
 
 // ─── ROSTER ──────────────────────────────────────────────────────────────────
 // id: short, unique, no spaces (used in BOX below). number/positions optional.
+// Add number: and positions: [...] to anyone as you get them.
 const ROSTER = [
-  // { id: 'luis', name: 'Luis Martinez', number: 6, positions: ['SS', 'P'] },
+  { id: 'luis-bueno',         name: 'Luis Bueno' },
+  { id: 'luis-martinez',      name: 'Luis Martínez' },
+  { id: 'george-castillo',    name: 'George Castillo' },
+  { id: 'albert-corniell',    name: 'Albert Corniell' },
+  { id: 'randy-rodriguez',    name: 'Randy Rodríguez' },
+  { id: 'omar-lugo',          name: 'Omar Lugo' },
+  { id: 'manuel-contreras',   name: 'Manuel Contreras' },
+  { id: 'enderson-jean',      name: 'Enderson Jean' },
+  { id: 'alvaro-ascanio',     name: 'Alvaro Ascanio' },
+  { id: 'jose-roa',           name: 'José Roa' },
+  { id: 'angel-vasquez',      name: 'Angel Vásquez' },
+  { id: 'mychal-lett',        name: 'Mychal Lett' },
+  { id: 'ramesh',             name: 'Ramesh' },
+  { id: 'rey-alvarado',       name: 'Rey Alvarado' },
+  { id: 'deano-thompson',     name: 'Deano Thompson' },
+  { id: 'jean-cruz',          name: 'Jean Cruz' },
+  { id: 'anthony-torres',     name: 'Anthony Torres' },
+  { id: 'juan-gomez',         name: 'Juan Gómez' },
+  { id: 'derlyn-reyes',       name: 'Derlyn Reyes' },
+  { id: 'ray-peralta',        name: 'Ray Peralta' },
+  { id: 'manny-velazquez',    name: 'Manny Velázquez' },
+  { id: 'marvin-ramos',       name: 'Marvin Ramos' },
+  { id: 'jorge-suarez',       name: 'Jorge Suárez' },
+  { id: 'akeem-fleming',      name: 'Akeem Fleming' },
 ];
 
 // ─── BOX SCORES ──────────────────────────────────────────────────────────────
