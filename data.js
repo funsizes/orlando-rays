@@ -35,8 +35,8 @@ const FIELDS = {
 const GAMES = [
   { id: '2026-11-22-g1', date: '2026-11-22', num: 1, time: '9:00 AM', field: 'beisbol',
     opponent: 'TBD', home: true,  score: { us: 3, them: 1 }, notes: 'Opening day doubleheader' },
-  { id: '2026-11-22-g2', date: '2026-11-22', num: 2, time: 'TBD',     field: 'beisbol',
-    opponent: 'TBD', home: null,  score: null, notes: '' }
+  { id: '2026-11-22-g2', date: '2026-11-22', num: 2, time: '10:30 AM', field: 'beisbol',
+    opponent: 'TBD', home: null,  score: { us: 12, them: 13 }, notes: 'Battled back. Rays outscored them 15–14 over the doubleheader.' }
 ];
 
 // ─── OTHER LEAGUE RESULTS (games the Rays weren't in) ────────────────────────
@@ -98,8 +98,32 @@ const BOX = {
       'chait-samuel':    { pos: 'P', ab: 2, h: 1, rbi: 1 },            // 1B (RBI), 4-3
     },
     pitching: {
-      // Complete game. H / ER / BB / SO not tracked yet.
-      'chait-samuel':    { ip: '6.0', r: 1, dec: 'W' },
+      // Complete game. H / BB / SO not tracked yet. ER = R (errors not tracked yet).
+      'chait-samuel':    { ip: '6.0', r: 1, er: 1, dec: 'W' },
+    }
+  },
+  '2026-11-22-g2': {
+    // Lineup order as given. Subs listed right after the player they replaced.
+    batting: {
+      'omar-lugo':       { ab: 1, r: 1, bb: 2, rbi: 1 },             // BB, 1-3, BB (RBI); also out on the bases as a pinch runner
+      'mychal-lett':     { ab: 4, r: 2, h: 3, '2b': 1, rbi: 2 },     // 1B, 2B, 4-3, 1B
+      'randy-rodriguez': { ab: 1, r: 2, h: 1, bb: 2, rbi: 2 },       // BB, BB, 1B
+      'albert-corniell': { ab: 2, bb: 2 },                           // FC4, BB, 4-3, BB  (sent as "Alvaro"; 4th spot = Albert?)
+      'juan-gomez':      { ab: 4, h: 2, rbi: 2, so: 1 },             // 5-3, 1B (RBI), K, 1B (RBI)
+      'marvin-ramos':    { ab: 2, h: 1, bb: 2, rbi: 1 },             // BB, BB, 1B (RBI), F9
+      'rey-alvarado':    { ab: 3, r: 1, h: 2, sf: 1, rbi: 1 },       // 1B, SF8 (RBI), 1B, F9
+      'luis-bueno':      { ab: 2, h: 1, bb: 1, so: 1 },              // BB, K, 1B
+      'luis-martinez':   { ab: 2, rbi: 1 },                          // 5-4-3 DP (RBI), 4-3
+      'chait-samuel':    { r: 1, bb: 1 },                            //   PH for Luis M: BB
+      'ray-peralta':     { ab: 2, bb: 1, so: 1 },                    // BB, 1-3, Kᴸ
+      'alvaro-ascanio':  { ab: 1, h: 1, bb: 1 },                     // BB, 1B
+      'deano-thompson':  { r: 1, bb: 1, rbi: 1 },                    //   sub for Alvaro: BB (RBI)
+    },
+    pitching: {
+      // ER = R (errors not tracked yet). H / BB / SO not tracked yet. L not assigned.
+      'mychal-lett':     { ip: '1.1', r: 7, er: 7 },
+      'luis-martinez':   { ip: '1.2', r: 2, er: 2 },
+      'chait-samuel':    { ip: '3.0', r: 4, er: 4 },
     }
   },
   // '2026-11-22-g1': {

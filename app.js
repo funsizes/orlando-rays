@@ -460,7 +460,7 @@ function renderStats() {
     </div>
     ${statsTab === 'batting' ? batTbl : pitTbl}
     <p class="muted small">Tap a column to sort. Qualified = ${statsTab === 'batting' ? '2 plate appearances' : '1 inning pitched'} per team game.
-      ${statsTab === 'pitching' ? `ERA is based on ${LEAGUE.inningsPerGame}-inning games.` : ''}</p>`;
+      ${statsTab === 'pitching' ? `ERA = earned runs per ${LEAGUE.inningsPerGame} innings. Errors aren't tracked yet, so every run counts as earned. — = not tracked yet.` : ''}</p>`;
 }
 
 // ── GAME (BOX SCORE) ─────────────────────────────────────────────────────────
