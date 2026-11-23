@@ -13,7 +13,9 @@ const TEAM = {
 const LEAGUE = {
   name: 'Liga Amistosa de Orlando',
   regularSeasonGames: 16,   // per team
-  playoffTeams: 8,
+  playoffTeams: 6,
+  playoffMinGames: 8,        // rules 4 & 10: games needed to play in playoffs
+  playoffMinGamesPitcher: 6, // rule 4: pitchers need 6
   inningsPerGame: 6,        // used for ERA (earned runs per 6 innings)
   // All 9 teams (from the league's Nov 22 graphic)
   teams: [
@@ -52,6 +54,53 @@ const OTHER_RESULTS = [
   { date: '2026-11-22', winner: 'Los Vengadores', loser: 'Team Añejo' },
   { date: '2026-11-22', winner: 'Team Panas',     loser: 'Dodgers' },
   { date: '2026-11-22', winner: 'Team Panas',     loser: 'Dodgers' },
+];
+
+// ─── LEAGUE RULES ────────────────────────────────────────────────────────────
+// From the "Reglas de la Liga" graphic (WhatsApp, Nov 3 2026). English is our translation.
+const RULES = [
+  { es: 'Todos los juegos serán a 6 entradas o 1 hora y 10 min.',
+    en: 'All games are 6 innings or 1 hour 10 minutes.' },
+  { es: 'Antes de comenzar el juego cada dirigente debe entregar su line-up debidamente llenado con el nombre y apellido y sus posiciones. Todo jugador suplente que no esté en el line card no podrá jugar ese partido.',
+    en: 'Before the game, each manager must hand in a lineup card filled out with first and last names and positions. Any sub not on the line card cannot play that game.' },
+  { es: 'Jugador que sea puesto a jugar y no esté en el line-up, después de un lanzamiento cantado será descalificado del juego ya que es un jugador ilegal.',
+    en: 'A player put in the game who is not on the lineup is an illegal player and is disqualified from the game once a pitch has been called.' },
+  { es: 'Todos los jugadores tienen que tener mínimo 8 juegos y los pitchers 6 juegos para poder jugar en los playoffs y serie final.',
+    en: 'Players need at least 8 games, and pitchers 6 games, to play in the playoffs and final series.' },
+  { es: 'Solo el mánager puede reclamar jugadas con el árbitro. Cualquier otro jugador que intervenga con el árbitro y el árbitro lo expulse del juego tiene una multa de $30 dólares.',
+    en: 'Only the manager may dispute calls with the umpire. Any other player who argues with the umpire and gets ejected is fined $30.' },
+  { es: 'Pisa y corre desde segunda y tercera.',
+    en: 'Tag-ups are allowed from second and third.' },
+  { es: 'Hay nocaut de 12 carreras en la 3.ª entrada y de 10 carreras desde la 4.ª entrada.',
+    en: 'Mercy rule: 12 runs after the 3rd inning, 10 runs from the 4th inning on.' },
+  { es: 'Solo corredor emergente por el pitcher y catcher.',
+    en: 'Courtesy runners only for the pitcher and catcher.' },
+  { es: 'Todos los juegos empiezan a las 9:00 AM y si a las 9:15 hay un equipo incompleto será un forfeit.',
+    en: 'All games start at 9:00 AM. A team that is still incomplete at 9:15 forfeits.' },
+  { es: 'Si NO calificas 8 juegos no puedes entrar a los playoffs o serie final.',
+    en: 'If you don’t reach 8 games, you can’t play in the playoffs or final series.' },
+  { es: 'Si tenemos un juego empatado en la 6ta entrada habrá corredor en 2da y el corredor será el último out de la entrada que pasó. Esta regla aplica solo en la serie regular.',
+    en: 'If a game is tied after the 6th inning, each extra inning starts with a runner on 2nd: the last out of the previous inning. Regular season only.' },
+  { es: 'Roster de 25 peloteros máximo.',
+    en: 'Rosters are capped at 25 players.' },
+  { es: 'Los pitchers son obligados a usar la careta.',
+    en: 'Pitchers must wear a face mask.' },
+  { es: 'Cada equipo pone una bola nueva y otra usada.',
+    en: 'Each team provides one new ball and one used ball.' },
+  { es: 'Todo equipo debe tener uniforme.',
+    en: 'Every team must wear uniforms.' },
+  { es: 'La liga no es responsable por algún daño dentro del complejo ni afuera del mismo.',
+    en: 'The league is not responsible for any damage inside or outside the complex.' },
+  { es: 'Si el pitcher es removido al banco ya no podrá volver a jugar en ninguna posición en ese juego.',
+    en: 'A pitcher who is taken out to the bench cannot return at any position that game.' },
+  { es: 'Cada equipo tiene la responsabilidad de limpiar el dugout cada vez que culminen los juegos. De encontrar basura habrá una multa de $20 dólares.',
+    en: 'Each team must clean its dugout after every game. If trash is found, the fine is $20.' },
+  { es: 'El short field debe jugar en la grama.',
+    en: 'The short fielder must play on the grass.' },
+  { es: 'No se permiten cleats de metal; solamente cleats de goma.',
+    en: 'No metal cleats. Rubber cleats only.' },
+  { es: 'Si hay una doble matanza el jugador debe salirse; de no hacerlo es puesto out.',
+    en: 'On a double-play attempt, the runner must get out of the way. If not, he is called out.' },
 ];
 
 // ─── ROSTER ──────────────────────────────────────────────────────────────────

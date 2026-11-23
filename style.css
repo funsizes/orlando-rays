@@ -264,3 +264,39 @@ footer { text-align: center; color: var(--muted); font-size: .78rem; padding: 1.
   .tbl th, .tbl td { padding: .45rem .45rem; }
 }
 .player-nick { font-size: .78rem; color: var(--muted); font-style: italic; }
+
+/* ── Playoff eligibility ── */
+.elig { margin-top: .6rem; }
+.elig-bar { height: 5px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); overflow: hidden; }
+.elig-bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.elig-txt { font-size: .68rem; color: var(--muted); margin-top: .25rem; font-weight: 600; }
+.elig-ok .elig-bar span { background: var(--win); }
+.elig-ok .elig-txt { color: var(--win); }
+.elig-big { max-width: 320px; margin: .25rem 0 .5rem; }
+.elig-big .elig-bar { height: 8px; }
+.elig-big .elig-txt { font-size: .8rem; }
+
+/* ── Rules ── */
+.format { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .6rem; margin-bottom: 1.25rem; }
+.format > div { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem .9rem; box-shadow: var(--shadow); }
+.format b { display: block; font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1.1; }
+.format span { font-size: .8rem; color: var(--muted); font-weight: 600; }
+.rules { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: .5rem; }
+.rules li {
+  display: flex; gap: .8rem; align-items: flex-start;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: .7rem .9rem; box-shadow: var(--shadow);
+}
+.rule-n {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--navy); color: var(--accent-2); font-weight: 800; font-size: .9rem;
+}
+.rule-t { font-size: .92rem; line-height: 1.45; padding-top: .2rem; }
+.id-callout {
+  display: flex; gap: .9rem; align-items: center; margin-top: 1rem;
+  background: var(--navy); color: #fff; border-radius: var(--radius); padding: .9rem 1.1rem;
+  border-left: 5px solid var(--accent-2);
+}
+.id-callout i { font-size: 1.6rem; color: var(--accent-2); }
+.id-callout span { display: block; color: #c5d3e8; font-size: .9rem; }
+@media (max-width: 520px) { .rules { grid-template-columns: 1fr; } }

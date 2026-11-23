@@ -187,8 +187,27 @@ const ROUTES = {
   stats:     { nav: 'stats',     title: 'Stats',     fn: renderStats },
   roster:    { nav: 'roster',    title: 'Roster',    fn: renderRoster },
   game:      { nav: 'schedule',  title: 'Box Score', fn: renderGame },
-  player:    { nav: 'roster',    title: 'Player',    fn: renderPlayer }
+  player:    { nav: 'roster',    title: 'Player',    fn: renderPlayer },
+  rules:     { nav: 'rules',     title: 'Rules',     fn: renderRules }
 };
+
+// Playoff eligibility (league rules 4 & 10): games appeared in / games pitched
+function appearances(pid) {
+  const gs = played().filter(g => BOX[g.id]?.batting?.[pid] || BOX[g.id]?.pitching?.[pid]).length;
+  const gp = played().filter(g => BOX[g.id]?.pitching?.[pid]).length;
+  return { gs, gp };
+}
+function eligHtml(pid, big = false) {
+  const { gs, gp } = appearances(pid);
+  const need = LEAGUE.playoffMinGames, needP = LEAGUE.playoffMinGamesPitcher;
+  const ok = gs >= need || (gp > 0 && gp >= needP);
+  const pct = Math.min(100, Math.round(gs / need * 100));
+  return `
+    <div class="elig ${big ? 'elig-big' : ''} ${ok ? 'elig-ok' : ''}" title="Playoffs need ${need} games (pitchers ${needP})">
+      <div class="elig-bar"><span style="width:${pct}%"></span></div>
+      <div class="elig-txt">${ok ? '✓ Playoff eligible' : `${gs}/${need} games for playoffs`}${gp ? ` · pitched ${gp}/${needP}` : ''}</div>
+    </div>`;
+}
 
 function route() {
   const [name, ...rest] = location.hash.replace(/^#\/?/, '').split('/');
@@ -572,9 +591,53 @@ function renderRoster() {
           <div class="player-name">${esc(p.name)}</div>${p.nickname ? `<div class="player-nick">"${esc(p.nickname)}"</div>` : ''}
           <div class="player-pos">${(p.positions || []).map(x => `<span class="pos">${esc(x)}</span>`).join('')}</div>
           ${s && s.ab ? `<div class="player-line">${rate(s.avg)} · ${s.hr} HR · ${s.rbi} RBI</div>` : ''}
+          ${eligHtml(p.id)}
         </a>`;
-    }).join('')}</div>`;
+    }).join('')}</div>
+    <p class="muted small">Playoff eligibility: ${LEAGUE.playoffMinGames} games played (pitchers ${LEAGUE.playoffMinGamesPitcher}). See <a href="#rules">league rules</a> 4 &amp; 10.</p>`;
 }
+
+// ── RULES ────────────────────────────────────────────────────────────────────
+
+let rulesLang = 'es';
+
+function renderRules() {
+  const es = rulesLang === 'es';
+  const t = (a, b) => es ? a : b;
+  return `
+    <div class="toolbar">
+      <h1 class="page-title" style="margin:0">${t('Reglas de la Liga', 'League Rules')}</h1>
+      <div class="tabs" role="tablist">
+        <button class="tab ${es ? 'active' : ''}" data-rules-lang="es" role="tab">Español</button>
+        <button class="tab ${!es ? 'active' : ''}" data-rules-lang="en" role="tab">English</button>
+      </div>
+    </div>
+
+    <div class="format">
+      <div><b>${LEAGUE.regularSeasonGames}</b><span>${t('juegos de temporada', 'regular-season games')}</span></div>
+      <div><b>${LEAGUE.playoffTeams}</b><span>${t(`de ${LEAGUE.teams.length} equipos a playoffs`, `of ${LEAGUE.teams.length} teams make playoffs`)}</span></div>
+      <div><b>${LEAGUE.inningsPerGame}</b><span>${t('entradas o 1 h 10 min', 'innings or 1 hr 10 min')}</span></div>
+      <div><b>${LEAGUE.playoffMinGames}</b><span>${t(`juegos para playoffs (pitchers ${LEAGUE.playoffMinGamesPitcher})`, `games to be playoff eligible (pitchers ${LEAGUE.playoffMinGamesPitcher})`)}</span></div>
+    </div>
+
+    <ol class="rules">
+      ${RULES.map((r, i) => `<li><span class="rule-n">${i + 1}</span><span class="rule-t">${esc(es ? r.es : r.en)}</span></li>`).join('')}
+    </ol>
+
+    <div class="id-callout">
+      <i class="fas fa-id-card"></i>
+      <div><b>${t('Cada jugador debe traer su ID.', 'Every player must bring their ID.')}</b>
+      <span>${t('Sin ID no podrá jugar.', 'No ID, no play.')}</span></div>
+    </div>
+    <p class="muted small">${t(
+      `Transcrito del gráfico oficial de ${LEAGUE.name}.`,
+      `Translated from the official ${LEAGUE.name} rules graphic. If anything differs, the Spanish version rules.`)}</p>`;
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-rules-lang]');
+  if (b) { rulesLang = b.dataset.rulesLang; route(); }
+});
 
 // ── PLAYER ───────────────────────────────────────────────────────────────────
 
@@ -594,9 +657,10 @@ function renderPlayer(pid) {
     <a class="back" href="#roster">← Roster</a>
     <h1 class="page-title">${esc(name)} ${p?.nickname ? `<span class="muted">"${esc(p.nickname)}"</span> ` : ''}${p?.number != null ? `<span class="muted">#${esc(p.number)}</span>` : ''}</h1>
     ${p?.positions?.length ? `<div class="player-pos left">${p.positions.map(x => `<span class="pos">${esc(x)}</span>`).join('')}</div>` : ''}
+    ${p ? eligHtml(pid, true) : ''}
 
     ${b ? `<div class="kpis">${kpi(rate(b.avg), 'AVG')}${kpi(rate(b.obp), 'OBP')}${kpi(rate(b.slg), 'SLG')}${kpi(b.h, 'H')}${kpi(b.hr, 'HR')}${kpi(b.rbi, 'RBI')}${kpi(b.r, 'R')}</div>` : ''}
-    ${pt ? `<div class="kpis">${kpi(pt.ip, 'IP')}${kpi(dec2(pt.era), 'ERA')}${kpi(pt.so, 'SO')}${kpi(`${pt.w}-${pt.l}`, 'W-L')}</div>` : ''}
+    ${pt ? `<div class="kpis">${kpi(pt.ip, 'IP')}${kpi(dec2(pt.era), 'ERA')}${kpi(pv(pt, 'so'), 'SO')}${kpi(`${pt.w}-${pt.l}`, 'W-L')}</div>` : ''}
 
     ${batLog.length ? `
       <h2 class="sec-title">Batting Game Log</h2>
