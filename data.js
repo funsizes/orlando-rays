@@ -14,7 +14,7 @@ const LEAGUE = {
   name: 'Liga Amistosa',
   regularSeasonGames: 16,   // per team
   playoffTeams: 8,
-  inningsPerGame: 7,        // used for ERA (runs allowed per 7 innings)
+  inningsPerGame: 6,        // used for ERA (earned runs per 6 innings)
   // All 9 teams. Add the other 8 names here as you learn them.
   teams: [
     'Orlando Rays'
@@ -34,7 +34,7 @@ const FIELDS = {
 //   line:  optional inning-by-inning runs, e.g. { us: [2,0,1,3,0,2], them: [0,1,0,0,4,0,0] }
 const GAMES = [
   { id: '2026-11-22-g1', date: '2026-11-22', num: 1, time: '9:00 AM', field: 'beisbol',
-    opponent: 'TBD', home: true,  score: null, notes: 'Opening day doubleheader' },
+    opponent: 'TBD', home: true,  score: { us: 3, them: 1 }, notes: 'Opening day doubleheader' },
   { id: '2026-11-22-g2', date: '2026-11-22', num: 2, time: 'TBD',     field: 'beisbol',
     opponent: 'TBD', home: null,  score: null, notes: '' }
 ];
@@ -78,7 +78,29 @@ const ROSTER = [
 // Keyed by game id. Batting order = order listed. Leave out any stat that's 0.
 //   batting:  ab r h 2b 3b hr rbi bb so hbp sb sf
 //   pitching: ip (e.g. "4.2" = 4⅔) h r er bb so hbp hr, dec: 'W' | 'L' | 'S'
+//             Pitching is different: leave out what you DON'T KNOW (shows as —).
+//             If it really was zero, write 0.
 const BOX = {
+  '2026-11-22-g1': {
+    // Scorebook notes: L4 = lineout to 2B, 4-3 = grounder 2B→1B, F6/F8/F9 = flyout SS/CF/RF,
+    // L4-3 DP = lineout doubled off 1st, FC1 = fielder's choice to the pitcher.
+    batting: {
+      'omar-lugo':       { ab: 3 },                          // L4, 4-3, F6
+      'mychal-lett':     { ab: 3, r: 1, h: 1, '3b': 1 },     // 3B, F8, F9
+      'randy-rodriguez': { ab: 2, bb: 1, so: 1 },            // BB, Kᴸ, 6-3
+      'albert-corniell': { ab: 2, h: 1, rbi: 1, so: 1 },     // 1B (RBI), K
+      'juan-gomez':      { ab: 1, bb: 1 },                   // BB, 4-3
+      'rey-alvarado':    { ab: 2, r: 1, h: 1 },              // L4-3 DP, 1B
+      'luis-bueno':      { ab: 2, h: 1 },                    // 4-3, 1B
+      'luis-martinez':   { ab: 2, h: 2, rbi: 1 },            // 1B, 1B (RBI)
+      'ray-peralta':     { ab: 1, bb: 1 },                   // FC1, BB
+      'chait-samuel':    { ab: 2, h: 1, rbi: 1 },            // 1B (RBI), 4-3
+    },
+    pitching: {
+      // Complete game. H / ER / BB / SO not tracked yet.
+      'chait-samuel':    { ip: '6.0', r: 1, dec: 'W' },
+    }
+  },
   // '2026-11-22-g1': {
   //   batting: {
   //     luis: { ab: 4, r: 2, h: 3, '2b': 1, rbi: 2, bb: 1 },

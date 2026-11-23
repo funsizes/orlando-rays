@@ -60,15 +60,28 @@ function ipToOuts(ip) {
 const outsToIp = o => `${Math.floor(o / 3)}.${o % 3}`;
 
 function blankBat() { const o = { g: 0 }; BAT_KEYS.forEach(k => o[k] = 0); return o; }
-function blankPit() { const o = { g: 0, outs: 0, w: 0, l: 0, s: 0 }; PIT_KEYS.forEach(k => o[k] = 0); return o; }
+// Pitching: a stat left out of a line means "unknown" (not 0), so it shows as — and
+// isn't counted in ERA/WHIP. Batting: left out = 0.
+function blankPit() {
+  const o = { g: 0, outs: 0, w: 0, l: 0, s: 0, erOuts: 0, whipOuts: 0, miss: {} };
+  PIT_KEYS.forEach(k => { o[k] = 0; o.miss[k] = 0; });
+  return o;
+}
 
 function addBat(t, s) { t.g++; BAT_KEYS.forEach(k => t[k] += +(s[k] || 0)); return t; }
 function addPit(t, s) {
-  t.g++; t.outs += ipToOuts(s.ip);
-  PIT_KEYS.forEach(k => t[k] += +(s[k] || 0));
+  const outs = ipToOuts(s.ip);
+  t.g++; t.outs += outs;
+  PIT_KEYS.forEach(k => { if (s[k] == null) t.miss[k]++; else t[k] += +s[k]; });
+  if (s.er != null) t.erOuts += outs;
+  if (s.h != null && s.bb != null) t.whipOuts += outs;
   if (s.dec === 'W') t.w++; if (s.dec === 'L') t.l++; if (s.dec === 'S') t.s++;
   return t;
 }
+// Season pitching value, or — if no game line has it
+const pv = (r, k) => r.miss[k] === r.g ? '—' : r[k];
+// Single game pitching value
+const gv = (s, k) => s[k] == null ? '—' : s[k];
 
 function batCalc(t) {
   const pa = t.ab + t.bb + t.hbp + t.sf;
@@ -79,10 +92,9 @@ function batCalc(t) {
   return { ...t, pa, tb, avg, obp, slg, ops: obp != null && slg != null ? obp + slg : null };
 }
 function pitCalc(t) {
-  const ip = t.outs / 3;
   return { ...t, ip: outsToIp(t.outs),
-    era:  ip ? t.er * LEAGUE.inningsPerGame / ip : null,
-    whip: ip ? (t.bb + t.h) / ip : null };
+    era:  t.erOuts   ? t.er * LEAGUE.inningsPerGame / (t.erOuts / 3) : null,
+    whip: t.whipOuts ? (t.bb + t.h) / (t.whipOuts / 3) : null };
 }
 
 const rate = x => x == null ? '—' : (x < 1 ? x.toFixed(3).slice(1) : x.toFixed(3));
@@ -257,8 +269,11 @@ function leadersHtml() {
   const bat = seasonBatting(), pit = seasonPitching();
   if (!bat.length && !pit.length) return '';
   const top = (arr, key, fmt, filter = () => true, asc = false) => {
-    const c = arr.filter(filter).filter(r => r[key] != null).sort((a, b) => asc ? a[key] - b[key] : b[key] - a[key])[0];
-    return c ? { who: c.pid, val: fmt(c[key]) } : null;
+    const rows = arr.filter(filter).filter(r => r[key] != null).sort((a, b) => asc ? a[key] - b[key] : b[key] - a[key]);
+    const c = rows[0];
+    if (!c) return null;
+    const tied = rows.filter(r => r[key] === c[key]).length - 1;
+    return { who: c.pid, val: fmt(c[key]), tied };
   };
   const cards = [
     ['AVG', top(bat, 'avg', rate, qualBat)],
@@ -274,10 +289,10 @@ function leadersHtml() {
   return `
     <h2 class="sec-title">Team Leaders</h2>
     <div class="leaders">${cards.map(([label, v]) => `
-      <a class="leader" href="#player/${encodeURIComponent(v.who)}">
+      <a class="leader" href="${v.tied ? '#stats' : '#player/' + encodeURIComponent(v.who)}">
         <div class="leader-label">${label}</div>
         <div class="leader-val">${v.val}</div>
-        <div class="leader-name">${esc(playerName(v.who))}</div>
+        <div class="leader-name">${v.tied ? `${v.tied + 1}-way tie` : esc(playerName(v.who))}</div>
       </a>`).join('')}
     </div>`;
 }
@@ -429,8 +444,8 @@ function renderStats() {
       </tr></thead>
       <tbody>${sortRows(pit, SORT.pit).map(r => `
         <tr><td class="l name">${playerLink(r.pid)}</td>
-          <td>${r.g}</td><td>${r.w}</td><td>${r.l}</td><td>${r.s}</td><td>${r.ip}</td><td>${r.h}</td><td>${r.r}</td>
-          <td>${r.er}</td><td>${r.bb}</td><td>${r.so}</td><td class="hi">${dec2(r.era)}</td><td>${dec2(r.whip)}</td></tr>`).join('')}
+          <td>${r.g}</td><td>${r.w}</td><td>${r.l}</td><td>${r.s}</td><td>${r.ip}</td><td>${pv(r,"h")}</td><td>${pv(r,"r")}</td>
+          <td>${pv(r,"er")}</td><td>${pv(r,"bb")}</td><td>${pv(r,"so")}</td><td class="hi">${dec2(r.era)}</td><td>${dec2(r.whip)}</td></tr>`).join('')}
       </tbody>
     </table></div>`;
 
@@ -505,7 +520,7 @@ function renderGame(id) {
     <div class="table-wrap"><table class="tbl">
       <thead><tr><th class="l">Pitcher</th><th>IP</th><th>H</th><th>R</th><th>ER</th><th>BB</th><th>SO</th></tr></thead>
       <tbody>${pitEntries.map(([pid, s]) => {
-        const v = k => +(s[k] || 0);
+        const v = k => gv(s, k);
         return `<tr><td class="l name">${playerLink(pid)}${s.dec ? ` <span class="tag">${esc(s.dec)}</span>` : ''}</td><td>${outsToIp(ipToOuts(s.ip))}</td><td>${v('h')}</td><td>${v('r')}</td><td>${v('er')}</td><td>${v('bb')}</td><td>${v('so')}</td></tr>`;
       }).join('')}</tbody>
     </table></div>`;
@@ -576,7 +591,7 @@ function renderPlayer(pid) {
       <div class="table-wrap"><table class="tbl">
         <thead><tr><th class="l">Game</th><th>DEC</th><th>IP</th><th>H</th><th>R</th><th>ER</th><th>BB</th><th>SO</th></tr></thead>
         <tbody>${pitLog.map(g => {
-          const s = BOX[g.id].pitching[pid], v = k => +(s[k] || 0);
+          const s = BOX[g.id].pitching[pid], v = k => gv(s, k);
           return `<tr><td class="l"><a href="#game/${g.id}">${fmtShort(g.date)}${gameLabel(g) ? ' G' + (g.num || 1) : ''} ${vsLabel(g)}</a></td><td>${esc(s.dec || '')}</td><td>${outsToIp(ipToOuts(s.ip))}</td><td>${v('h')}</td><td>${v('r')}</td><td>${v('er')}</td><td>${v('bb')}</td><td>${v('so')}</td></tr>`;
         }).join('')}</tbody>
       </table></div>` : ''}
