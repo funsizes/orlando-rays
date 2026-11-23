@@ -94,6 +94,7 @@ const BOX = {
       'luis-bueno':      { ab: 2, h: 1 },                    // 4-3, 1B
       'luis-martinez':   { ab: 2, h: 2, rbi: 1 },            // 1B, 1B (RBI)
       'ray-peralta':     { ab: 1, bb: 1 },                   // FC1, BB
+      'alvaro-ascanio':  { ab: 2, h: 1, so: 1 },             // 1B, K
       'chait-samuel':    { ab: 2, h: 1, rbi: 1 },            // 1B (RBI), 4-3
     },
     pitching: {
