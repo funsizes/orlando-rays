@@ -52,12 +52,19 @@ const recStr = r => `${r.w}-${r.l}${r.t ? '-' + r.t : ''}`;
 const BAT_KEYS = ['ab', 'r', 'h', '2b', '3b', 'hr', 'rbi', 'bb', 'so', 'hbp', 'sb', 'sf'];
 const PIT_KEYS = ['h', 'r', 'er', 'bb', 'so', 'hbp', 'hr'];
 
+// Accepts baseball shorthand ("4.1" = 4⅓, "4.2" = 4⅔) or decimals ("4.33", "4.67")
 function ipToOuts(ip) {
   if (ip == null || ip === '') return 0;
   const [w, f = '0'] = String(ip).split('.');
-  return (parseInt(w, 10) || 0) * 3 + (parseInt(f, 10) || 0);
+  const whole = (parseInt(w, 10) || 0) * 3;
+  if (f.length <= 1) return whole + (parseInt(f, 10) || 0);
+  return whole + Math.round(parseFloat('0.' + f) * 3);
 }
-const outsToIp = o => `${Math.floor(o / 3)}.${o % 3}`;
+// Display innings as real fractions: 9, 1⅓, 1⅔
+const outsToIp = o => {
+  const w = Math.floor(o / 3), r = o % 3;
+  return r === 0 ? String(w) : `${w || ''}${r === 1 ? '⅓' : '⅔'}`;
+};
 
 function blankBat() { const o = { g: 0 }; BAT_KEYS.forEach(k => o[k] = 0); return o; }
 // Pitching: a stat left out of a line means "unknown" (not 0), so it shows as — and
@@ -130,31 +137,45 @@ function playerLink(pid) {
 
 function standings() {
   const rows = {};
-  const team = n => rows[n] ||= { team: n, w: 0, l: 0, t: 0, rs: 0, ra: 0, results: [] };
+  const team = n => rows[n] ||= { team: n, w: 0, l: 0, t: 0, rs: 0, ra: 0, noScore: 0, results: [] };
   LEAGUE.teams.forEach(team);
 
-  const addResult = (date, a, as, b, bs) => {
+  // a beat b (or tied). Scores optional: games without scores still count for W/L,
+  // but that team's RS/RA/DIFF show — since they'd be incomplete.
+  const addResult = (date, a, b, as, bs, tie = false) => {
     const ta = team(a), tb = team(b);
-    ta.rs += as; ta.ra += bs; tb.rs += bs; tb.ra += as;
-    if (as > bs) { ta.w++; tb.l++; ta.results.push([date, 'W']); tb.results.push([date, 'L']); }
-    else if (as < bs) { ta.l++; tb.w++; ta.results.push([date, 'L']); tb.results.push([date, 'W']); }
-    else { ta.t++; tb.t++; ta.results.push([date, 'T']); tb.results.push([date, 'T']); }
+    if (as != null && bs != null) { ta.rs += as; ta.ra += bs; tb.rs += bs; tb.ra += as; }
+    else { ta.noScore++; tb.noScore++; }
+    if (tie) { ta.t++; tb.t++; ta.results.push([date, 'T']); tb.results.push([date, 'T']); }
+    else { ta.w++; tb.l++; ta.results.push([date, 'W']); tb.results.push([date, 'L']); }
   };
 
-  played().forEach(g => { if (!isTBD(g.opponent)) addResult(g.date, TEAM.name, g.score.us, g.opponent, g.score.them); });
-  OTHER_RESULTS.forEach(r => addResult(r.date, r.home, r.homeScore, r.away, r.awayScore));
+  played().forEach(g => {
+    if (isTBD(g.opponent)) return;
+    const { us, them } = g.score;
+    if (us >= them) addResult(g.date, TEAM.name, g.opponent, us, them, us === them);
+    else addResult(g.date, g.opponent, TEAM.name, them, us);
+  });
+  OTHER_RESULTS.forEach(r => {
+    if (r.winner) return addResult(r.date, r.winner, r.loser, r.winnerScore, r.loserScore, !!r.tie);
+    // { home, away, homeScore, awayScore } form
+    if (r.homeScore >= r.awayScore) addResult(r.date, r.home, r.away, r.homeScore, r.awayScore, r.homeScore === r.awayScore);
+    else addResult(r.date, r.away, r.home, r.awayScore, r.homeScore);
+  });
 
   const list = Object.values(rows).map(r => {
     const gp = r.w + r.l + r.t;
     const res = r.results.sort((a, b) => a[0].localeCompare(b[0])).map(x => x[1]);
     let streak = '';
     if (res.length) { const last = res[res.length - 1]; let n = 0; for (let i = res.length - 1; i >= 0 && res[i] === last; i--) n++; streak = last + n; }
-    return { ...r, gp, pct: gp ? (r.w + r.t / 2) / gp : 0, diff: r.rs - r.ra, streak };
-  }).sort((a, b) => b.pct - a.pct || b.diff - a.diff || b.w - a.w || a.team.localeCompare(b.team));
+    const scored = gp > 0 && r.noScore === 0;
+    return { ...r, gp, pct: gp ? (r.w + r.t / 2) / gp : null, scored, diff: scored ? r.rs - r.ra : null, streak };
+  });
 
-  const lead = list[0];
-  list.forEach(r => r.gb = lead ? ((lead.w - r.w) + (r.l - lead.l)) / 2 : 0);
-  return list;
+  // Games behind the best record, then sort by GB, wins, run diff, name
+  const best = list.reduce((m, r) => (r.w - r.l) > (m.w - m.l) ? r : m, list[0]);
+  list.forEach(r => r.gb = best ? ((best.w - r.w) + (r.l - best.l)) / 2 : 0);
+  return list.sort((a, b) => a.gb - b.gb || b.w - a.w || (b.diff ?? 0) - (a.diff ?? 0) || a.team.localeCompare(b.team));
 }
 
 // ── ROUTER ───────────────────────────────────────────────────────────────────
@@ -373,8 +394,8 @@ function renderStandings() {
             <td>${r.gp}</td><td>${r.w}</td><td>${r.l}</td><td>${r.t}</td>
             <td>${r.gp ? rate(r.pct) : '—'}</td>
             <td>${r.gb === 0 ? '—' : r.gb.toFixed(1)}</td>
-            <td>${r.rs}</td><td>${r.ra}</td>
-            <td class="${r.diff > 0 ? 'up' : r.diff < 0 ? 'down' : ''}">${r.diff > 0 ? '+' : ''}${r.diff}</td>
+            <td>${r.scored ? r.rs : '—'}</td><td>${r.scored ? r.ra : '—'}</td>
+            <td class="${r.diff > 0 ? 'up' : r.diff < 0 ? 'down' : ''}">${r.diff == null ? '—' : (r.diff > 0 ? '+' : '') + r.diff}</td>
             <td>${r.streak || '—'}</td>
           </tr>`).join('')}
         </tbody>
@@ -382,7 +403,8 @@ function renderStandings() {
     </div>
     <p class="muted small">Top ${LEAGUE.playoffTeams} make the playoffs (line under #${LEAGUE.playoffTeams}). Ties count as half a win.</p>
     ${missingTeams ? `<p class="muted small">${missingTeams} of the league's 9 teams haven't been added yet.</p>` : ''}
-    ${partial ? `<p class="muted small">Only Rays games are counted so far. Other teams' results get added as they come in.</p>` : ''}`;
+    ${partial ? `<p class="muted small">Only Rays games are counted so far. Other teams' results get added as they come in.</p>` : ''}
+    ${rows.some(r => r.gp && !r.scored) ? `<p class="muted small">RS / RA / DIFF show — for teams whose game scores we don't have yet.</p>` : ''}`;
 }
 
 // ── STATS ────────────────────────────────────────────────────────────────────

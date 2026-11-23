@@ -11,13 +11,14 @@ const TEAM = {
 };
 
 const LEAGUE = {
-  name: 'Liga Amistosa',
+  name: 'Liga Amistosa de Orlando',
   regularSeasonGames: 16,   // per team
   playoffTeams: 8,
   inningsPerGame: 6,        // used for ERA (earned runs per 6 innings)
-  // All 9 teams. Add the other 8 names here as you learn them.
+  // All 9 teams (from the league's Nov 22 graphic)
   teams: [
-    'Orlando Rays'
+    'Orlando Rays', 'Cleveland', 'Los Brechones', 'Team Buffalo', 'Los Vengadores',
+    'Team Añejo', 'Team Panas', 'Dodgers', 'Altamira'
   ]
 };
 
@@ -34,15 +35,24 @@ const FIELDS = {
 //   line:  optional inning-by-inning runs, e.g. { us: [2,0,1,3,0,2], them: [0,1,0,0,4,0,0] }
 const GAMES = [
   { id: '2026-11-22-g1', date: '2026-11-22', num: 1, time: '9:00 AM', field: 'beisbol',
-    opponent: 'TBD', home: true,  score: { us: 3, them: 1 }, notes: 'Opening day doubleheader' },
+    opponent: 'Cleveland', home: true,  score: { us: 3, them: 1 }, notes: 'Opening day doubleheader' },
   { id: '2026-11-22-g2', date: '2026-11-22', num: 2, time: '10:30 AM', field: 'beisbol',
-    opponent: 'TBD', home: null,  score: { us: 12, them: 13 }, notes: 'Battled back. Rays outscored them 15–14 over the doubleheader.' }
+    opponent: 'Cleveland', home: null,  score: { us: 12, them: 13 }, notes: 'Battled back. Rays outscored Cleveland 15–14 over the doubleheader.' }
 ];
 
 // ─── OTHER LEAGUE RESULTS (games the Rays weren't in) ────────────────────────
-// Only needed for the standings table. Example:
-//   { date: '2026-11-22', home: 'Team A', away: 'Team B', homeScore: 6, awayScore: 4 }
-const OTHER_RESULTS = [];
+// Only needed for the standings table. One line per game. Scores are optional:
+//   { date: '2026-11-22', winner: 'Team A', loser: 'Team B' }
+//   { date: '2026-11-22', winner: 'Team A', loser: 'Team B', winnerScore: 6, loserScore: 4 }
+const OTHER_RESULTS = [
+  // Nov 22: all doubleheaders (Altamira had the bye)
+  { date: '2026-11-22', winner: 'Los Brechones',  loser: 'Team Buffalo' },
+  { date: '2026-11-22', winner: 'Los Brechones',  loser: 'Team Buffalo' },
+  { date: '2026-11-22', winner: 'Los Vengadores', loser: 'Team Añejo' },
+  { date: '2026-11-22', winner: 'Los Vengadores', loser: 'Team Añejo' },
+  { date: '2026-11-22', winner: 'Team Panas',     loser: 'Dodgers' },
+  { date: '2026-11-22', winner: 'Team Panas',     loser: 'Dodgers' },
+];
 
 // ─── ROSTER ──────────────────────────────────────────────────────────────────
 // id: short, unique, no spaces (used in BOX below). number/positions optional.
