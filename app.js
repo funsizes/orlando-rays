@@ -504,12 +504,12 @@ function renderGame(id) {
     const T = batCalc(tot);
     batHtml = `
       <div class="table-wrap"><table class="tbl">
-        <thead><tr><th class="l">Batter</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>BB</th><th>SO</th><th>SB</th></tr></thead>
+        <thead><tr><th class="l">Batter</th><th class="l">Pos</th><th>AB</th><th>R</th><th>H</th><th>2B</th><th>3B</th><th>HR</th><th>RBI</th><th>BB</th><th>SO</th><th>SB</th></tr></thead>
         <tbody>${batEntries.map(([pid, s]) => {
           const v = k => +(s[k] || 0);
-          return `<tr><td class="l name">${playerLink(pid)}</td><td>${v('ab')}</td><td>${v('r')}</td><td>${v('h')}</td><td>${v('2b')}</td><td>${v('3b')}</td><td>${v('hr')}</td><td>${v('rbi')}</td><td>${v('bb')}</td><td>${v('so')}</td><td>${v('sb')}</td></tr>`;
+          return `<tr><td class="l name">${playerLink(pid)}</td><td class="l muted">${esc(s.pos || '')}</td><td>${v('ab')}</td><td>${v('r')}</td><td>${v('h')}</td><td>${v('2b')}</td><td>${v('3b')}</td><td>${v('hr')}</td><td>${v('rbi')}</td><td>${v('bb')}</td><td>${v('so')}</td><td>${v('sb')}</td></tr>`;
         }).join('')}</tbody>
-        <tfoot><tr><td class="l">Team</td><td>${T.ab}</td><td>${T.r}</td><td>${T.h}</td><td>${T['2b']}</td><td>${T['3b']}</td><td>${T.hr}</td><td>${T.rbi}</td><td>${T.bb}</td><td>${T.so}</td><td>${T.sb}</td></tr></tfoot>
+        <tfoot><tr><td class="l">Team</td><td></td><td>${T.ab}</td><td>${T.r}</td><td>${T.h}</td><td>${T['2b']}</td><td>${T['3b']}</td><td>${T.hr}</td><td>${T.rbi}</td><td>${T.bb}</td><td>${T.so}</td><td>${T.sb}</td></tr></tfoot>
       </table></div>`;
   }
 
@@ -547,7 +547,7 @@ function renderRoster() {
         <a class="player" href="#player/${encodeURIComponent(p.id)}">
           <div class="player-num">${p.number != null ? '#' + esc(p.number) : ''}</div>
           <div class="avatar">${esc(initials)}</div>
-          <div class="player-name">${esc(p.name)}</div>
+          <div class="player-name">${esc(p.name)}</div>${p.nickname ? `<div class="player-nick">"${esc(p.nickname)}"</div>` : ''}
           <div class="player-pos">${(p.positions || []).map(x => `<span class="pos">${esc(x)}</span>`).join('')}</div>
           ${s && s.ab ? `<div class="player-line">${rate(s.avg)} · ${s.hr} HR · ${s.rbi} RBI</div>` : ''}
         </a>`;
@@ -570,7 +570,7 @@ function renderPlayer(pid) {
 
   return `
     <a class="back" href="#roster">← Roster</a>
-    <h1 class="page-title">${esc(name)} ${p?.number != null ? `<span class="muted">#${esc(p.number)}</span>` : ''}</h1>
+    <h1 class="page-title">${esc(name)} ${p?.nickname ? `<span class="muted">"${esc(p.nickname)}"</span> ` : ''}${p?.number != null ? `<span class="muted">#${esc(p.number)}</span>` : ''}</h1>
     ${p?.positions?.length ? `<div class="player-pos left">${p.positions.map(x => `<span class="pos">${esc(x)}</span>`).join('')}</div>` : ''}
 
     ${b ? `<div class="kpis">${kpi(rate(b.avg), 'AVG')}${kpi(rate(b.obp), 'OBP')}${kpi(rate(b.slg), 'SLG')}${kpi(b.h, 'H')}${kpi(b.hr, 'HR')}${kpi(b.rbi, 'RBI')}${kpi(b.r, 'R')}</div>` : ''}

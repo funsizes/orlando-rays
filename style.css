@@ -263,3 +263,4 @@ footer { text-align: center; color: var(--muted); font-size: .78rem; padding: 1.
   .tbl { font-size: .8rem; }
   .tbl th, .tbl td { padding: .45rem .45rem; }
 }
+.player-nick { font-size: .78rem; color: var(--muted); font-style: italic; }

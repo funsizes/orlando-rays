@@ -48,26 +48,26 @@ const OTHER_RESULTS = [];
 // id: short, unique, no spaces (used in BOX below). number/positions optional.
 // Add number: and positions: [...] to anyone as you get them.
 const ROSTER = [
-  { id: 'luis-bueno',         name: 'Luis Bueno' },
-  { id: 'luis-martinez',      name: 'Luis Martínez' },
+  { id: 'luis-bueno',         name: 'Luis Bueno', positions: ['2B'] },
+  { id: 'luis-martinez',      name: 'Luis Martínez', positions: ['C'] },
   { id: 'george-castillo',    name: 'George Castillo' },
-  { id: 'albert-corniell',    name: 'Albert Corniell' },
-  { id: 'randy-rodriguez',    name: 'Randy Rodríguez' },
-  { id: 'omar-lugo',          name: 'Omar Lugo' },
+  { id: 'albert-corniell',    name: 'Albert Corniell', positions: ['1B'] },
+  { id: 'randy-rodriguez',    name: 'Randy Rodríguez', positions: ['3B'] },
+  { id: 'omar-lugo',          name: 'Omar Lugo', positions: ['SS'] },
   { id: 'manuel-contreras',   name: 'Manuel Contreras' },
   { id: 'enderson-jean',      name: 'Enderson Jean' },
-  { id: 'alvaro-ascanio',     name: 'Alvaro Ascanio' },
+  { id: 'alvaro-ascanio',     name: 'Alvaro Ascanio', positions: ['RF'] },
   { id: 'jose-roa',           name: 'José Roa' },
   { id: 'angel-vazquez',      name: 'Angel Vazquez' },
-  { id: 'mychal-lett',        name: 'Mychal Lett' },
-  { id: 'chait-samuel',       name: 'Chait Samuel' },
-  { id: 'rey-alvarado',       name: 'Rey Alvarado' },
+  { id: 'mychal-lett',        name: 'Mychal Lett', positions: ['LF'] },
+  { id: 'chait-samuel',       name: 'Chait Samuel', positions: ['P'] },
+  { id: 'rey-alvarado',       name: 'Rey Alvarado', positions: ['EH'] },
   { id: 'deano-thompson',     name: 'Deano Thompson' },
   { id: 'jean-cruz',          name: 'Jean Cruz' },
   { id: 'anthony-torres',     name: 'Anthony Torres' },
-  { id: 'juan-gomez',         name: 'Juan Gómez' },
+  { id: 'juan-gomez',         name: 'Juan Gómez', positions: ['RCF'], nickname: 'Sonny' },
   { id: 'derlyn-reyes',       name: 'Derlyn Reyes' },
-  { id: 'ray-peralta',        name: 'Ray Peralta' },
+  { id: 'ray-peralta',        name: 'Ray Peralta', positions: ['LCF'] },
   { id: 'manny-velazquez',    name: 'Manny Velázquez' },
   { id: 'marvin-ramos',       name: 'Marvin Ramos' },
   { id: 'jorge-suarez',       name: 'Jorge Suárez' },
@@ -85,17 +85,17 @@ const BOX = {
     // Scorebook notes: L4 = lineout to 2B, 4-3 = grounder 2B→1B, F6/F8/F9 = flyout SS/CF/RF,
     // L4-3 DP = lineout doubled off 1st, FC1 = fielder's choice to the pitcher.
     batting: {
-      'omar-lugo':       { ab: 3 },                          // L4, 4-3, F6
-      'mychal-lett':     { ab: 3, r: 1, h: 1, '3b': 1 },     // 3B, F8, F9
-      'randy-rodriguez': { ab: 2, bb: 1, so: 1 },            // BB, Kᴸ, 6-3
-      'albert-corniell': { ab: 2, h: 1, rbi: 1, so: 1 },     // 1B (RBI), K
-      'juan-gomez':      { ab: 1, bb: 1 },                   // BB, 4-3
-      'rey-alvarado':    { ab: 2, r: 1, h: 1 },              // L4-3 DP, 1B
-      'luis-bueno':      { ab: 2, h: 1 },                    // 4-3, 1B
-      'luis-martinez':   { ab: 2, h: 2, rbi: 1 },            // 1B, 1B (RBI)
-      'ray-peralta':     { ab: 1, bb: 1 },                   // FC1, BB
-      'alvaro-ascanio':  { ab: 2, h: 1, so: 1 },             // 1B, K
-      'chait-samuel':    { ab: 2, h: 1, rbi: 1 },            // 1B (RBI), 4-3
+      'omar-lugo':       { pos: 'SS', ab: 3 },                          // L4, 4-3, F6
+      'mychal-lett':     { pos: 'LF', ab: 3, r: 1, h: 1, '3b': 1 },     // 3B, F8, F9
+      'randy-rodriguez': { pos: '3B', ab: 2, bb: 1, so: 1 },            // BB, Kᴸ, 6-3
+      'albert-corniell': { pos: '1B', ab: 2, h: 1, rbi: 1, so: 1 },     // 1B (RBI), K
+      'juan-gomez':      { pos: 'RCF', ab: 1, bb: 1 },                   // BB, 4-3
+      'rey-alvarado':    { pos: 'EH', ab: 2, r: 1, h: 1 },              // L4-3 DP, 1B
+      'luis-bueno':      { pos: '2B', ab: 2, h: 1 },                    // 4-3, 1B
+      'luis-martinez':   { pos: 'C', ab: 2, h: 2, rbi: 1 },            // 1B, 1B (RBI)
+      'ray-peralta':     { pos: 'LCF', ab: 1, bb: 1 },                   // FC1, BB
+      'alvaro-ascanio':  { pos: 'RF', ab: 2, h: 1, so: 1 },             // 1B, K
+      'chait-samuel':    { pos: 'P', ab: 2, h: 1, rbi: 1 },            // 1B (RBI), 4-3
     },
     pitching: {
       // Complete game. H / ER / BB / SO not tracked yet.
