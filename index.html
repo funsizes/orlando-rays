@@ -38,7 +38,12 @@
 
 <footer id="footer"></footer>
 
-<script src="data.js"></script>
-<script src="app.js"></script>
+<!-- Load data/app with a fresh query string so weekly updates show up right away (Pages caches ~10 min) -->
+<script>
+  (function () {
+    var v = Date.now();
+    document.write('<script src="data.js?v=' + v + '"><\/script><script src="app.js?v=' + v + '"><\/script>');
+  })();
+</script>
 </body>
 </html>
